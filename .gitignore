@@ -9,6 +9,7 @@
 sessions/
 demo_sessions_*/
 *.session.json
+.sovereign-agent-data/
 
 # ── Python standard ──────────────────────────────────────────────────
 __pycache__/

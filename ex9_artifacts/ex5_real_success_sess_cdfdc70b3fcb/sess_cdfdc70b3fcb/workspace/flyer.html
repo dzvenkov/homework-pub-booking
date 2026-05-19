@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Castle Pub Event Flyer</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5efe3;
+        --panel: #fffaf0;
+        --ink: #1f2a30;
+        --accent: #9b4d1f;
+        --border: #d8c3a5;
+      }
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background: linear-gradient(180deg, #efe3cf 0%, var(--bg) 100%);
+        color: var(--ink);
+      }
+      main {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 32px;
+        background: var(--panel);
+        border: 2px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 14px 40px rgba(31, 42, 48, 0.12);
+      }
+      h1 {
+        margin-top: 0;
+        color: var(--accent);
+        letter-spacing: 0.04em;
+      }
+      .lede {
+        font-size: 1.1rem;
+        margin-bottom: 24px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+      .fact {
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+      }
+      .label {
+        display: block;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6a655f;
+        margin-bottom: 6px;
+      }
+      .note {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px dashed var(--border);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Edinburgh Pub Night</h1>
+      <p class="lede">Join us at <strong data-testid="venue_name">The Castle Pub</strong> for an evening booking in Edinburgh.</p>
+      <section class="grid">
+      <div class="fact"><span class="label">Venue Name</span><span data-testid="venue_name">The Castle Pub</span></div>
+      <div class="fact"><span class="label">Venue Address</span><span data-testid="venue_address">Castle Road, Edinburgh</span></div>
+      <div class="fact"><span class="label">Date</span><span data-testid="date">2023-11-24</span></div>
+      <div class="fact"><span class="label">Time</span><span data-testid="time">19:00</span></div>
+      <div class="fact"><span class="label">Party Size</span><span data-testid="party_size">10</span></div>
+      <div class="fact"><span class="label">Condition</span><span data-testid="condition">sunny</span></div>
+      <div class="fact"><span class="label">Temperature C</span><span data-testid="temperature_c">15C</span></div>
+      <div class="fact"><span class="label">Total Gbp</span><span data-testid="total_gbp">£150</span></div>
+      <div class="fact"><span class="label">Deposit Required Gbp</span><span data-testid="deposit_required_gbp">£50</span></div>
+      </section>
+      <section class="note">
+        <p>Weather outlook: <span data-testid="weather_summary">sunny, 15C</span></p>
+        <p>Total estimated cost: <strong data-testid="total_gbp">£150</strong></p>
+        <p>Deposit required: <strong data-testid="deposit_required_gbp">£50</strong></p>
+      </section>
+    </main>
+  </body>
+</html>

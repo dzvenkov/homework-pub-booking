@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
+from pathlib import Path
 
 from sovereign_agent._internal.llm_client import (
     FakeLLMClient,
@@ -32,6 +34,27 @@ from sovereign_agent.tickets.ticket import list_tickets
 
 from starter.edinburgh_research.integrity import clear_log, verify_dataflow
 from starter.edinburgh_research.tools import build_tool_registry
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _configure_persistent_data_dir(real: bool) -> Path | None:
+    """On WSL, default real-mode artifacts into the repo so Windows tools can open them.
+
+    The framework already supports SOVEREIGN_AGENT_DATA_DIR; we only set a default
+    when running real mode under WSL and the user has not explicitly chosen a path.
+    """
+    if not real or os.environ.get("SOVEREIGN_AGENT_DATA_DIR"):
+        return None
+    if "WSL_DISTRO_NAME" not in os.environ:
+        return None
+
+    data_dir = _repo_root() / ".sovereign-agent-data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    os.environ["SOVEREIGN_AGENT_DATA_DIR"] = str(data_dir)
+    return data_dir
 
 
 def _build_fake_client() -> FakeLLMClient:
@@ -194,30 +217,41 @@ async def run_scenario(real: bool) -> int:
     # NotImplementedError, and those successful calls would otherwise
     # populate _TOOL_CALL_LOG before the real scenario runs.
     clear_log()
+    configured_data_dir = _configure_persistent_data_dir(real)
+    if configured_data_dir is not None:
+        print(f"Using repo-local SOVEREIGN_AGENT_DATA_DIR: {configured_data_dir}")
 
     with example_sessions_dir("ex5-edinburgh-research", persist=real) as sessions_root:
+        task_prompt = (
+            "Research an Edinburgh pub and produce an HTML event flyer.\n\n"
+            "Context:\n"
+            "  - party size: 6\n"
+            "  - date: 2026-04-25 (a Saturday)\n"
+            "  - time: 19:30\n"
+            "  - area: near Haymarket station, Edinburgh\n\n"
+            "PLANNING INSTRUCTION:\n"
+            "  - Keep dependent work bundled so the executor does not lose state between subgoals.\n"
+            "  - Prefer exactly 2 loop subgoals for this task.\n"
+            "  - Subgoal 1 should cover venue_search, choosing the venue, get_weather, and calculate_cost.\n"
+            "  - Subgoal 2 should cover generate_flyer and complete_task.\n"
+            "  - Do not create a separate subgoal that requires a venue_id without also including how that venue_id is obtained.\n"
+            "  - Do not hand off to structured for this scenario.\n\n"
+            "REQUIRED tool sequence (all four tools MUST run, in order):\n"
+            "  1. venue_search(near='Haymarket', party_size=6, budget_max_gbp=800)\n"
+            "  2. get_weather(city='edinburgh', date='2026-04-25')\n"
+            "  3. calculate_cost(venue_id=<chosen pub's id>, party_size=6,\n"
+            "                    duration_hours=3, catering_tier='bar_snacks')\n"
+            "  4. generate_flyer(event_details={...})  <-- MUST be called\n"
+            "  5. complete_task(result={'flyer': 'workspace/flyer.html', ...})\n\n"
+            "Do NOT call complete_task until you have called generate_flyer. "
+            "The scenario is graded by the existence of workspace/flyer.html, "
+            "not by your final text response. The flyer is HTML — exact tool "
+            "names and argument shapes are in each tool's docstring; call them "
+            "exactly as described."
+        )
         session = create_session(
             scenario="edinburgh-research",
-            task=(
-                "Research an Edinburgh pub and produce an HTML event flyer.\n\n"
-                "Context:\n"
-                "  - party size: 6\n"
-                "  - date: 2026-04-25 (a Saturday)\n"
-                "  - time: 19:30\n"
-                "  - area: near Haymarket station, Edinburgh\n\n"
-                "REQUIRED tool sequence (all four tools MUST run, in order):\n"
-                "  1. venue_search(near='Haymarket', party_size=6, budget_max_gbp=800)\n"
-                "  2. get_weather(city='edinburgh', date='2026-04-25')\n"
-                "  3. calculate_cost(venue_id=<chosen pub's id>, party_size=6,\n"
-                "                    duration_hours=3, catering_tier='bar_snacks')\n"
-                "  4. generate_flyer(event_details={...})  <-- MUST be called\n"
-                "  5. complete_task(result={'flyer': 'workspace/flyer.html', ...})\n\n"
-                "Do NOT call complete_task until you have called generate_flyer. "
-                "The scenario is graded by the existence of workspace/flyer.html, "
-                "not by your final text response. The flyer is HTML — exact tool "
-                "names and argument shapes are in each tool's docstring; call them "
-                "exactly as described."
-            ),
+            task=task_prompt,
             sessions_dir=sessions_root,
         )
         print(f"Session {session.session_id}")
@@ -247,7 +281,7 @@ async def run_scenario(real: bool) -> int:
             executor=DefaultExecutor(model=executor_model, client=client, tools=tools),  # type: ignore[arg-type]
         )
 
-        result = await half.run(session, {"task": "research Edinburgh venue and write flyer"})
+        result = await half.run(session, {"task": task_prompt})
         print(f"\nLoop half outcome: {result.next_action}")
         print(f"  summary: {result.summary}")
 

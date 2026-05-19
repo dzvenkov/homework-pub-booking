@@ -1,0 +1,42 @@
+{
+  "session_id": "sess_cdfdc70b3fcb",
+  "version": 1,
+  "created_at": "2026-05-19T22:03:37.736448+00:00",
+  "updated_at": "2026-05-19T22:04:06.020633+00:00",
+  "scenario": "edinburgh-research",
+  "state": "executing",
+  "user_id": null,
+  "current_half": "loop",
+  "planner": {
+    "subgoals": [
+      {
+        "id": "sg_1",
+        "description": "Search for venues near Haymarket, select one, retrieve weather, and calculate event costs.",
+        "success_criterion": "Venue ID selected, weather data for Edinburgh on 2026-04-25 obtained, and cost calculation completed.",
+        "estimated_tool_calls": 3,
+        "depends_on": [],
+        "assigned_half": "loop",
+        "status": "pending"
+      },
+      {
+        "id": "sg_2",
+        "description": "Generate HTML event flyer and complete the task.",
+        "success_criterion": "Flyer HTML file created at workspace/flyer.html and task marked complete.",
+        "estimated_tool_calls": 2,
+        "depends_on": [
+          "sg_1"
+        ],
+        "assigned_half": "loop",
+        "status": "pending"
+      }
+    ]
+  },
+  "executor": {},
+  "structured": {},
+  "memory": {},
+  "handoff_history": [],
+  "bare_mode": false,
+  "config_overrides": {},
+  "result": null,
+  "resumed_from": null
+}
