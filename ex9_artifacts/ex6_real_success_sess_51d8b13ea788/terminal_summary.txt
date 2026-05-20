@@ -1,0 +1,24 @@
+Ex6-real manual tier-2 success
+Session id: sess_51d8b13ea788
+Date: 2026-05-20
+
+Mode:
+- Terminal 1 equivalent: rasa-actions running on :5055
+- Terminal 2 equivalent: rasa-serve running on :5005
+- Terminal 3 equivalent: starter.rasa_half.run --real
+
+Observed result:
+- Structured half outcome: complete
+- Summary: booking confirmed by rasa (ref=BK-7D401E9E)
+- Booking payload committed with:
+  - venue_id: haymarket_tap
+  - date: 2026-04-25
+  - time: 19:30
+  - party_size: 6
+  - deposit_gbp: 200
+  - duration_hours: 3
+  - catering_tier: bar_snacks
+
+Notes:
+- This confirms the real manual Ex6 workflow succeeded against running rasa-actions and rasa-serve processes.
+- The session folder itself is sparse because the Ex6 runner does not currently emit a trace.jsonl like Ex5.
