@@ -1,0 +1,6 @@
+{"event_type": "voice.utterance_in", "actor": "user", "timestamp": "2026-05-22T20:46:28.328385+00:00", "payload": {"text": "I need a table for six on Friday at half seven.", "turn": 0, "mode": "text"}}
+{"event_type": "voice.utterance_out", "actor": "manager", "timestamp": "2026-05-22T20:46:37.330560+00:00", "payload": {"text": "Aye, we can do that. I'll pencil you in for Friday at half seven. What's the contact number?", "turn": 0, "mode": "text"}}
+{"event_type": "voice.utterance_in", "actor": "user", "timestamp": "2026-05-22T20:46:37.330960+00:00", "payload": {"text": "The deposit would be two hundred pounds.", "turn": 1, "mode": "text"}}
+{"event_type": "voice.utterance_out", "actor": "manager", "timestamp": "2026-05-22T20:46:38.071283+00:00", "payload": {"text": "Aye, we can do that. I'll pencil you in for Friday at half seven. What's the contact number?", "turn": 1, "mode": "text"}}
+{"event_type": "voice.utterance_in", "actor": "user", "timestamp": "2026-05-22T20:46:38.071540+00:00", "payload": {"text": "Can I give you my contact number now?", "turn": 2, "mode": "text"}}
+{"event_type": "voice.utterance_out", "actor": "manager", "timestamp": "2026-05-22T20:46:38.509491+00:00", "payload": {"text": "Aye, go ahead and gie's yer number.", "turn": 2, "mode": "text"}}
