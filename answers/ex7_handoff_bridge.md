@@ -2,31 +2,27 @@
 
 ## Your answer
 
-The HandoffBridge orchestrates round-trips between the loop half and
-structured half. Each round: loop runs, if next_action=handoff_to_structured
-the bridge writes a forward handoff file, invokes structured, and then
-either marks the session complete (structured confirmed) or builds a
-reverse task and loops back (structured escalated).
+Ex7 is the round-trip glue between the open-ended loop half and the
+rule-bound structured half. The bridge keeps one current input payload,
+runs the loop half, packages any forward handoff into a structured-half
+request, and then either completes the session or builds a reverse task
+when structured rejects. The reverse task is the important part: it
+passes the previous loop result plus a human-readable rejection reason
+back into the next loop turn, so the retry is informed instead of being
+an unrelated fresh search.
 
-The reverse-task path is the interesting one. On escalation, the
-bridge rewrites the initial_task into a dict that contains
-prior_result + rejection_reason + retry=True. The loop half sees
-this via the new executor invocation and — in a real LLM setting —
-would produce a different subgoal. In the scripted offline demo we
-hardcode the retry choice (royal_oak with 16 seats) so the test is
-deterministic.
-
-Every half transition emits a session.state_changed trace event via
-session.append_trace_event(). The integrity check (integrity.py)
-verifies the trace has at least one round_start, at least one
-state_changed, and at least one tool call — catching the case where
-the bridge reports success without doing real work.
-
-The stale-handoff cleanup moves old ipc/handoff_to_structured.json
-files into logs/handoffs/ instead of deleting them, preserving the
-audit trail.
+The preserved Ex7 session shows the exact trajectory the assignment asks
+for. Round 1 moves from loop to structured, then back to loop with
+`party_too_large`. Round 2 hands off again with a revised proposal and
+finishes in `complete`. That session also preserves the concrete
+handoff payloads in executor tickets, which matters because Ex7 is not
+just about state transitions in the abstract; it is about carrying full
+context forward and the rejection reason backward without losing the
+thread of the booking.
 
 ## Citations
 
-- starter/handoff_bridge/bridge.py — HandoffBridge.run + helpers
-- starter/handoff_bridge/integrity.py — verify_dataflow
+- `starter/handoff_bridge/bridge.py`
+- `ex9_artifacts/ex7_real_success_sess_804d83ef21b7/session_artifacts/sess_804d83ef21b7/logs/trace.jsonl`
+- `ex9_artifacts/ex7_real_success_sess_804d83ef21b7/session_artifacts/sess_804d83ef21b7/logs/tickets/tk_5240eb12/raw_output.json`
+- `ex9_artifacts/ex7_real_success_sess_804d83ef21b7/session_artifacts/sess_804d83ef21b7/logs/tickets/tk_a5549d37/raw_output.json`
